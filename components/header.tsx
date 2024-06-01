@@ -13,10 +13,14 @@ const Header = () => {
   const router = useRouter();
 
   const handleLogout = async () => {
-    const { error } = await supabase.auth.signOut();
-    if (error) {
-      console.error('Error signing out:', error);
-    } else {
+    try {
+      const { error } = await supabase.auth.signOut();
+      if (error) {
+        console.error('Error signing out:', error);
+      } 
+    } catch(e) {
+      console.error('Exception: ', e);
+    } finally {
       await refreshUser();
       router.push('/');
     }
