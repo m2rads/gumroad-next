@@ -1,17 +1,16 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import Link from 'next/link';
-import { useAuth } from '@/components/context/auth-context';
+import { useAuth } from './context/auth-context';
 import { useRouter } from 'next/navigation';
-import { createSupabaseBrowserClient } from "@/supabase/client"
+import { createSupabaseBrowserClient } from '@/supabase/client';
 
+const supabase = createSupabaseBrowserClient();
 
 const Header = () => {
   const { user, loading, refreshUser } = useAuth();
   const router = useRouter();
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const supabase = createSupabaseBrowserClient()
 
   const handleLogout = async () => {
     const { error } = await supabase.auth.signOut();
@@ -23,11 +22,6 @@ const Header = () => {
     }
   };
 
-  useEffect(() => {
-    setIsLoggedIn(!!user);
-  }, [user]);
-
-
   if (loading) {
     return <div>Loading...</div>;
   }
@@ -35,14 +29,14 @@ const Header = () => {
   return (
     <div id="header">
       <a href="/"><h1 id="logo">Gumroad</h1></a>
-      {!isLoggedIn ? (
+      {!user ? (
         <p>Have an account? <Link href="/login" id="login-link" className="underline">Login</Link></p>
       ) : (
         <p id="account-navigation">
-          <Link href={user?.on_links_page ? "/home" : "/links"}>{user?.on_links_page ? "Home" : "Your links"}</Link> &bull; 
-          <span className="balance">${user?.balance}</span> &bull; 
+          <Link href={user.on_links_page ? "/home" : "/links"}>{user.on_links_page ? "Home" : "Your links"}</Link> &bull; 
+          <span className="balance">${user.balance}</span> &bull; 
           <Link href="/settings">Settings</Link> &bull; 
-          <button onClick={handleLogout}>Logout</button>
+          <button onClick={handleLogout} className="underline">Logout</button>
         </p>
       )}
       <ul id="navigation" className="hidden">

@@ -21,13 +21,32 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     setLoading(true);
     const session = await supabase.auth.getSession();
     if (session?.data.session?.user) {
-      const supabaseUser = session.data.session.user as any;
-      const customUser: User = {
-        ...supabaseUser,
-        balance: 0, // Initialize with default values or fetch from your DB
-        on_links_page: false, // Initialize with default values or fetch from your DB
-      };
-      setUser(customUser);
+      const supabaseUser = session.data.session.user;
+      const { data: profile, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', supabaseUser.id)
+        .single();
+
+      if (error) {
+        console.error('Error fetching profile:', error.message);
+        setUser(null);
+      } else {
+        if (!supabaseUser.email) {
+          console.error('Email is undefined for the authenticated user.');
+          setUser(null);
+        } else {
+          const customUser: User = {
+            id: supabaseUser.id,
+            email: supabaseUser.email,
+            balance: profile.balance,
+            number_of_links: profile.number_of_links,
+            reset_hash: profile.reset_hash,
+            on_links_page: false, // This can be set based on your logic
+          };
+          setUser(customUser);
+        }
+      }
     } else {
       setUser(null);
     }
