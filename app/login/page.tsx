@@ -1,7 +1,7 @@
 import { Metadata } from "next";
 import Link from "next/link";
 import UserSignInForm from "@/components/forms/user-signin-form";
-import readUserSession from "@/lib/supabase/user-session";
+import readUserSession from "@/supabase/user-session";
 import { redirect } from "next/navigation";
 
 export const metadata: Metadata = {
