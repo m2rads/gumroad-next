@@ -17,11 +17,6 @@ const EditLinkPage = ({ params }: { params: { permalink: string } }) => {
 
   useEffect(() => {
     const fetchLinkData = async () => {
-      if (!user) {
-        setError('User not authenticated');
-        return;
-      }
-
       try {
         const { data: link, error } = await supabase
           .from('links')
