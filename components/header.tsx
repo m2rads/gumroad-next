@@ -28,7 +28,7 @@ const Header = () => {
 
   return (
     <div id="header">
-      <a href="/"><h1 id="logo">Gumroad</h1></a>
+      <Link href="/"><h1 id="logo">Gumroad</h1></Link>
       {!user ? (
         <p>Have an account? <Link href="/login" id="login-link" className="underline">Login</Link></p>
       ) : (
