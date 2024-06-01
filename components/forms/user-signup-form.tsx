@@ -67,7 +67,7 @@ export default function UserSignUpForm() {
       toast({
         description: "Registered Successfully",
       })
-      router.push('/auth/signup/confirm')
+      router.push('/links')
     }
   };
 

@@ -1,6 +1,11 @@
 import UserSignUpForm from "@/components/forms/user-signup-form";
+import readUserSession from "@/supabase/user-session";
+import { redirect } from "next/navigation";
 
-export default function Home() {
+export default async function Home() {
+  const {data} = await readUserSession();
+  if (data.session) return redirect("/home")
+
   return (
     <div>
       <div id="intro">

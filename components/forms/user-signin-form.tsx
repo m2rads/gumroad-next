@@ -1,11 +1,11 @@
 'use client'
+
 import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
   FormField,
   FormItem,
-  FormLabel,
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
@@ -59,6 +59,7 @@ export default function UserSignInForm() {
       toast({
         description: "Log in was successful."
       });
+      router.push('/links')
     }
     setLoading(false);
   };
