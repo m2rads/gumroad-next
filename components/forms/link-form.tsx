@@ -1,7 +1,9 @@
-'use client'
+'use client';
+
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-// import { supabase } from '../utils/supabase';
+import { createSupabaseBrowserClient } from '@/supabase/client';
+import { useAuth } from '@/components/context/auth-context';
 
 interface LinkFormProps {
   editing?: boolean;
@@ -11,7 +13,10 @@ interface LinkFormProps {
 const LinkForm: React.FC<LinkFormProps> = ({ editing = false, initialData = {} }) => {
   const [formData, setFormData] = useState(initialData);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const router = useRouter();
+  const { user } = useAuth();
+  const supabase = createSupabaseBrowserClient();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -20,45 +25,89 @@ const LinkForm: React.FC<LinkFormProps> = ({ editing = false, initialData = {} }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // setLoading(true);
+    if (!user) {
+      setError('User not authenticated');
+      return;
+    }
 
-    // if (editing) {
-    //   const { error } = await supabase
-    //     .from('links')
-    //     .update(formData)
-    //     .eq('id', formData.id);
-    //   if (error) {
-    //     console.error(error.message);
-    //   } else {
-    //     router.push('/links');
-    //   }
-    // } else {
-    //   const { error } = await supabase
-    //     .from('links')
-    //     .insert([formData]);
-    //   if (error) {
-    //     console.error(error.message);
-    //   } else {
-    //     router.push('/links');
-    //   }
-    // }
+    setLoading(true);
+    setError(null);
 
-    setLoading(false);
+    try {
+      if (editing) {
+        // Update an existing link
+        const { data, error } = await supabase
+          .from('links')
+          .update({
+            name: formData.name,
+            price: formData.price,
+            url: formData.url,
+            preview_url: formData.preview_url,
+            description: formData.description,
+          })
+          .eq('id', formData.id);
+
+        if (error) {
+          setError(error.message);
+        } else {
+          router.push('/links');
+        }
+      } else {
+        // Create a new link
+        const { data, error } = await supabase
+          .from('links')
+          .insert([
+            {
+              owner: user.id,
+              name: formData.name,
+              price: formData.price,
+              url: formData.url,
+              preview_url: formData.preview_url,
+              description: formData.description,
+              unique_permalink: generatePermalink(),
+            },
+          ]);
+
+        if (error) {
+          setError(error.message);
+        } else {
+          router.push('/links');
+        }
+      }
+    } catch (error) {
+      setError((error as Error).message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleDelete = async () => {
     const confirmed = confirm("Are you sure you want to delete this link? There's no going back!");
-    // if (confirmed) {
-    //   const { error } = await supabase
-    //     .from('links')
-    //     .delete()
-    //     .eq('id', formData.id);
-    //   if (error) {
-    //     console.error(error.message);
-    //   } else {
-    //     router.push('/links');
-    //   }
-    // }
+    if (!confirmed) return;
+
+    setLoading(true);
+    setError(null);
+
+    try {
+      const { data, error } = await supabase
+        .from('links')
+        .delete()
+        .eq('id', formData.id);
+
+      if (error) {
+        setError(error.message);
+      } else {
+        router.push('/links');
+      }
+    } catch (error) {
+      setError((error as Error).message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const generatePermalink = () => {
+    return Math.random().toString(36).substring(2, 8);
   };
 
   return (
@@ -67,6 +116,8 @@ const LinkForm: React.FC<LinkFormProps> = ({ editing = false, initialData = {} }
         <a href="#" id="delete_link" onClick={handleDelete}>delete this link</a>
       )}
       <h3>{editing ? 'Edit link' : 'Create a new link'}</h3>
+
+      {error && <div className="error">{error}</div>}
 
       <p>
         <label htmlFor="name">Name:</label>
@@ -77,6 +128,7 @@ const LinkForm: React.FC<LinkFormProps> = ({ editing = false, initialData = {} }
           placeholder="name"
           value={formData.name || ''}
           onChange={handleChange}
+          disabled={loading}
         />
       </p>
       <p>
@@ -88,6 +140,7 @@ const LinkForm: React.FC<LinkFormProps> = ({ editing = false, initialData = {} }
           placeholder="$10"
           value={formData.price || ''}
           onChange={handleChange}
+          disabled={loading}
         />
       </p>
       <p>
@@ -99,6 +152,7 @@ const LinkForm: React.FC<LinkFormProps> = ({ editing = false, initialData = {} }
           placeholder="http://"
           value={formData.url || ''}
           onChange={handleChange}
+          disabled={loading}
         />
       </p>
       <p>
@@ -110,6 +164,7 @@ const LinkForm: React.FC<LinkFormProps> = ({ editing = false, initialData = {} }
           placeholder="http://"
           value={formData.preview_url || ''}
           onChange={handleChange}
+          disabled={loading}
         />
       </p>
       <p>
@@ -119,9 +174,10 @@ const LinkForm: React.FC<LinkFormProps> = ({ editing = false, initialData = {} }
           name="description"
           value={formData.description || ''}
           onChange={handleChange}
+          disabled={loading}
         ></textarea>
       </p>
-      <p><button type="submit">{editing ? 'Save changes' : 'Add link'}</button></p>
+      <p><button type="submit" disabled={loading}>{editing ? 'Save changes' : 'Add link'}</button></p>
 
       {editing && (
         <div className="mini-rule"></div>
