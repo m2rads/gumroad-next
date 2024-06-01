@@ -1,17 +1,17 @@
 'use client';
 
 import React from 'react';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
 interface HomeProps {
   showError: boolean;
   errorMessage?: string;
   numberOfDays: number;
   showChart: boolean;
-  chartMax: number;
-  chartNumbers: string;
-  lastSevenDaysPurchaseTotal: string; // Should be formatted price
-  lastMonthPurchaseTotal: string; // Should be formatted price
-  purchaseTotal: string; // Should be formatted price
+  chartData: { name: string; value: number }[];
+  lastSevenDaysPurchaseTotal: string;
+  lastMonthPurchaseTotal: string;
+  purchaseTotal: string;
 }
 
 const Home: React.FC<HomeProps> = ({
@@ -19,14 +19,11 @@ const Home: React.FC<HomeProps> = ({
   errorMessage,
   numberOfDays,
   showChart,
-  chartMax,
-  chartNumbers,
+  chartData,
   lastSevenDaysPurchaseTotal,
   lastMonthPurchaseTotal,
   purchaseTotal,
 }) => {
-  const chartUrl = `https://chart.googleapis.com/chart?chxr=0,0,${chartMax}&chf=bg,s,ffffff&chxt=y&chbh=a&chs=640x225&chco=CC333F,EB6841&cht=bvg&chds=0,${chartMax}&chd=t:${chartNumbers}`;
-
   return (
     <div id="dashboard">
       {showError ? (
@@ -34,15 +31,19 @@ const Home: React.FC<HomeProps> = ({
       ) : (
         <h3>Last {numberOfDays} day{numberOfDays !== 1 && 's'}</h3>
       )}
-      
+      {/* Had to use a third party lib for representing charts as google char api was deprecated */}
       <div className="chart">
         {showChart ? (
-          <img 
-            src={chartUrl} 
-            width="640" 
-            height="225" 
-            alt="Chart"
-          />
+          <ResponsiveContainer width="100%" height={225}>
+            <BarChart data={chartData}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="name" />
+              <YAxis />
+              <Tooltip />
+              <Legend />
+              <Bar dataKey="value" fill="#CC333F" />
+            </BarChart>
+          </ResponsiveContainer>
         ) : (
           <p>Wait a few days and a chart will show up here!</p>
         )}
@@ -68,11 +69,18 @@ const IndexPage: React.FC = () => {
     errorMessage: '',
     numberOfDays: 7,
     showChart: true,
-    chartMax: 120, // 1.2 * max value from chart_numbers
-    chartNumbers: '10,20,30,40,50,60,70,80,90,100', // Example data
-    lastSevenDaysPurchaseTotal: '500.00', // Formatted price
-    lastMonthPurchaseTotal: '2000.00', // Formatted price
-    purchaseTotal: '10000.00', // Formatted price
+    chartData: [
+      { name: 'Day 1', value: 10 },
+      { name: 'Day 2', value: 20 },
+      { name: 'Day 3', value: 30 },
+      { name: 'Day 4', value: 40 },
+      { name: 'Day 5', value: 50 },
+      { name: 'Day 6', value: 60 },
+      { name: 'Day 7', value: 70 },
+    ],
+    lastSevenDaysPurchaseTotal: '500.00',
+    lastMonthPurchaseTotal: '2000.00',
+    purchaseTotal: '10000.00',
   };
 
   return <Home {...sampleData} />;
