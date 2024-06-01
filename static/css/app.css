@@ -2,9 +2,9 @@
 
 #header p#account-navigation { color: #ccc; }
 
-#account-navigation span, #account-navigation a { margin: 0 10px; }
+#account-navigation span, #account-navigation a,  #account-navigation button{ margin: 0 10px; }
     #account-navigation .balance { color: #6c6b65; }
-    #account-navigation a:last-child { margin-right: 0; }
+    #account-navigation button:last-child { margin-right: 0; }
     
 /* app main */
 
