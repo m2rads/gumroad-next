@@ -7,18 +7,32 @@ interface Session {
     user: User;
   }
 
-export async function signUpWithEmail(data: {
-    email: string;
-    password: string;  
-}) {   
-    const cookieStore = cookies()
-
-    const supabase = createClient(cookieStore)
-    const result = await supabase.auth.signUp({email:data.email,password:data.password})
-    console.log('user', result?.data?.user)
+  export async function signUpWithEmail(data: { email: string; password: string }) {
+    const cookieStore = cookies();
+    const supabase = createClient(cookieStore);
     
-    return JSON.stringify(result);
+    const result = await supabase.auth.signUp({ email: data.email, password: data.password });
+    const user = result?.data?.user;
+
+    if (!user) {
+        // Handle error if user creation failed
+        return JSON.stringify({ error: result.error?.message || 'User creation failed' });
+    }
+
+    // Create a profile entry in the public.profiles table
+    const profileResult = await supabase
+        .from('profiles')
+        .insert([{ id: user.id, balance: 0, number_of_links: 0, reset_hash: '' }]);
+
+    if (profileResult.error) {
+        // Handle error if profile creation failed
+        return JSON.stringify({ error: profileResult.error.message });
+    }
+
+    // Return the user and profile data
+    return JSON.stringify({ user, profile: profileResult.data });
 }
+
 
 export async function signOut() {
     const cookieStore = cookies()
