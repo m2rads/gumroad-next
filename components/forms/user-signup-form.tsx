@@ -17,6 +17,7 @@ import { toast } from "../ui/use-toast";
 import { Toaster } from "../ui/toaster";
 import { useRouter } from 'next/navigation';
 import { signUpWithEmail } from "@/app/auth-server-action/actions";
+import { useAuth } from '@/components/context/auth-context';
 
 const formSchema = z.object({
   email: z.string().email({ message: "Enter a valid email address" }),
@@ -28,6 +29,7 @@ type UserFormValue = z.infer<typeof formSchema>;
 export default function UserSignUpForm() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
+  const { refreshUser } = useAuth();
 
   const defaultValues = {
     email: "",
@@ -62,6 +64,7 @@ export default function UserSignUpForm() {
       toast({
         description: "Registered Successfully",
       })
+      await refreshUser();
       router.push('/links')
     }
   };
