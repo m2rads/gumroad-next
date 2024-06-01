@@ -1,14 +1,24 @@
-'use server'
-import { signOut } from "../auth-server-action/actions"
+'use client'
+import { createSupabaseBrowserClient } from "@/supabase/client"
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
-export default async function Page() {
-    const result = await signOut()
-    const { error } = JSON.parse(result)
-    console.log("error signing out: ", error)
-    
+export default function Page() {
+    const router = useRouter()
+
+    useEffect(() => {
+        const supabase = createSupabaseBrowserClient()
+        const signOut = async () => {
+            const session = await supabase.auth.signOut();
+            console.log("session: ", session)
+            router.push("/")
+        }
+        signOut()
+    }, [])
+   
     return (
         <>
-            <p>Sere you again soon!</p>
+            <p>If you did not get redirected to the home page, please refresh your browser</p>
         </>
     )
 }
