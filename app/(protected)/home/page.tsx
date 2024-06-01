@@ -63,7 +63,7 @@ const Home: React.FC<HomeProps> = ({
   );
 };
 
-const IndexPage: React.FC = () => {
+export default function IndexPage () {
   const sampleData = {
     showError: false,
     errorMessage: '',
@@ -86,4 +86,3 @@ const IndexPage: React.FC = () => {
   return <Home {...sampleData} />;
 };
 
-export default IndexPage;
