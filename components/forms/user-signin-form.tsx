@@ -1,4 +1,4 @@
-"use client";
+'use client'
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -13,8 +13,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
-import GoogleSignInButton from "../google-auth-button";
-import type { Database } from "@/types/supabase";
 import { useRouter } from "next/navigation";
 import { signInWithEmailAndPassword } from "@/app/auth-server-action/actions";
 import { Toaster } from "../ui/toaster";
@@ -28,7 +26,7 @@ const formSchema = z.object({
 type UserFormValue = z.infer<typeof formSchema>;
 
 export default function UserSignInForm() {
-  const router = useRouter()
+  const router = useRouter();
   const [loading, setLoading] = useState(false);
 
   const defaultValues = {
@@ -42,78 +40,60 @@ export default function UserSignInForm() {
   });
 
   const onSubmit = async (data: UserFormValue) => {
-    setLoading(true)
-   console.log("loging in")
-   const result = await signInWithEmailAndPassword(data);
-    const {error} = JSON.parse(result)
+    setLoading(true);
+    console.log("loging in");
+    const result = await signInWithEmailAndPassword(data);
+    const { error } = JSON.parse(result);
 
     if (error?.message) {
       toast({
         variant: "destructive",
-        title: "Uh uh! Something went wrong.", 
+        title: "Uh uh! Something went wrong.",
         description: (
           <pre className="mt-2 w-[340px] rounded-md bg-zinc-700 p-4">
             <code className="text-white">{error.message}</code>
           </pre>
         )
-      })
-    }
-    else {
+      });
+    } else {
       toast({
-        description: "Log in was successfull."
-      })
+        description: "Log in was successful."
+      });
     }
-    setLoading(false)
+    setLoading(false);
   };
-
 
   return (
     <>
-      <GoogleSignInButton />
-      <div className="relative">
-          <div className="absolute inset-0 flex items-center">
-            <span className="w-full border-t" />
-          </div>
-          <div className="relative flex justify-center text-xs uppercase">
-            <span className="bg-background px-2 text-muted-foreground">
-              Or continue with
-            </span>
-          </div>
-      </div>
       <Form {...form}>
         <form
+          id="large-form"
           onSubmit={form.handleSubmit(onSubmit)}
-          className="space-y-2 w-full"
+          className="space-y-2 w-full p-6 rounded-lg shadow-lg"
+          style={{ background: "#fff" }}
         >
-          <FormField
-            control={form.control}
-            name="email"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Email</FormLabel>
-                <FormControl>
-                  <Input
-                    type="email"
-                    placeholder="you@example.com"
-                    disabled={loading}
-                    {...field}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
+          <div className="flex justify-between items-center">
+            {form.formState.errors.email || form.formState.errors.password ? (
+              <h3>
+                Log in to Gumroad <small className="error">{"Please provide valid information"}</small>
+              </h3>
+            ) : (
+              <h3>
+                Log in to Gumroad <small>Did we tell you we love you?</small>
+              </h3>
             )}
-          />
-
+          </div>
+          <div className="flex space-x-2 items-center">
             <FormField
               control={form.control}
-              name="password"
+              name="email"
               render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Password</FormLabel>
+                <FormItem className="flex-1">
                   <FormControl>
                     <Input
-                      type="password"
-                      placeholder="●●●●●●●"
+                      type="text"
+                      placeholder="Email Address"
+                      className="input-class"
                       disabled={loading}
                       {...field}
                     />
@@ -123,11 +103,35 @@ export default function UserSignInForm() {
               )}
             />
 
-          <Button disabled={loading} className="ml-auto w-full" type="submit">
-            Sign In With Email
-          </Button>
+            <FormField
+              control={form.control}
+              name="password"
+              render={({ field }) => (
+                <FormItem className="flex-1">
+                  <FormControl>
+                    <Input
+                      type="password"
+                      placeholder="Password"
+                      className="input-class"
+                      disabled={loading}
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <Button disabled={loading} className="button-class" type="submit">
+              Log in
+            </Button>
+          </div>
+          <div className="rainbow bar mt-2"></div>
         </form>
-      </Form>      
+      </Form>
+      <p id="below-form-p" className="mt-2 text-center">
+        <a href="/forgot-password" className="text-blue-600 hover:underline">Forgot your password?</a> We all do.
+      </p>
       <Toaster />
     </>
   );
