@@ -13,7 +13,7 @@ export async function GET(req: NextRequest) {
 
     if (error) {
       // TODO: redirect to error page with error message
-      return NextResponse.redirect(new URL('/auth/signup', req.url))
+      return NextResponse.redirect(new URL('/home', req.url))
     }
   }
 
