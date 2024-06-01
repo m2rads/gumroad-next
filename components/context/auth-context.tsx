@@ -1,5 +1,7 @@
+'use client'
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { getSession } from '@/app/auth-server-action/actions';
+// import { getSession } from '@/app/auth-server-action/actions';
+import { createSupabaseBrowserClient } from '@/supabase/client';
 import { User } from '@/types/user'
 
 interface AuthContextType {
@@ -14,9 +16,21 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    const supabase = createSupabaseBrowserClient();
     const checkUser = async () => {
-      const session = await getSession();
-      setUser(session?.user || null);
+      const session = await supabase.auth.getSession();
+      if (session?.data.session?.user) {
+        // Temporarily bypass type checking
+        const supabaseUser = session.data.session.user as any;
+        const customUser: User = {
+          ...supabaseUser,
+          balance: 0,
+          on_links_page: false,
+        };
+        setUser(customUser);
+      } else {
+        setUser(null);
+      }
       setLoading(false);
     };
 

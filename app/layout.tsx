@@ -21,10 +21,10 @@ interface RootLayoutProps {
 }
 
 export default function RootLayout({ children }: RootLayoutProps) {
-  const { user, loading } = useAuth(); // Use the authentication context
+  const { user, loading } = useAuth();
 
   if (loading) {
-    return <div>Loading...</div>; // Adjust this as needed
+    return <div>Loading...</div>;
   }
 
   return (
