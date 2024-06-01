@@ -28,25 +28,16 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         .eq('id', supabaseUser.id)
         .single();
 
-      if (error) {
-        console.error('Error fetching profile:', error.message);
-        setUser(null);
-      } else {
-        if (!supabaseUser.email) {
-          console.error('Email is undefined for the authenticated user.');
-          setUser(null);
-        } else {
-          const customUser: User = {
-            id: supabaseUser.id,
-            email: supabaseUser.email,
-            balance: profile.balance,
-            number_of_links: profile.number_of_links,
-            reset_hash: profile.reset_hash,
-            on_links_page: false, // This can be set based on your logic
-          };
-          setUser(customUser);
-        }
-      }
+      const customUser: User = {
+        id: supabaseUser.id,
+        email: supabaseUser.email || '',
+        balance: profile?.balance ?? 0,
+        number_of_links: profile?.number_of_links ?? 0,
+        reset_hash: profile?.reset_hash ?? '',
+        on_links_page: false,
+      };
+
+      setUser(customUser);
     } else {
       setUser(null);
     }
