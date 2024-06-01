@@ -22,7 +22,7 @@ interface RootLayoutProps {
 export default function RootLayout({ children }: RootLayoutProps) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className="overflow-hidden">
+      <body>
         <div className="top-bar"></div>
         <div id="loading-indicator">Loading...</div>
 
