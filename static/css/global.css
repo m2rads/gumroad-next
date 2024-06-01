@@ -30,7 +30,7 @@ a:active { color: #26898e; text-decoration: none; }
 .faint { opacity: .4; }
 
 #wrapper {
-    /* min-height: 100%; */
+    min-height: 100%;
 	height: auto !important;
 	height: 100%;
 	margin: 0 auto -140px;
