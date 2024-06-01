@@ -18,6 +18,12 @@ const LinkForm: React.FC<LinkFormProps> = ({ editing = false, initialData = {} }
   const { user } = useAuth();
   const supabase = createSupabaseBrowserClient();
 
+  useEffect(() => {
+    if (editing && initialData) {
+      setFormData(initialData);
+    }
+  }, [editing, initialData]);
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
