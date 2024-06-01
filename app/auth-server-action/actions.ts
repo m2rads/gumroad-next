@@ -1,6 +1,11 @@
 'use server'
 import { createClient } from "@/supabase/server";
 import { cookies } from "next/headers";
+import { User } from '@/types/user'
+
+interface Session {
+    user: User;
+  }
 
 export async function signUpWithEmail(data: {
     email: string;
@@ -47,9 +52,16 @@ export async function signInWithGoogle() {
     return JSON.stringify(result);
 }
 
-export async function getSession() {
-    const cookieStore = cookies()
-    const supabse = createClient(cookieStore)    
-    const result = await supabse.auth.getSession()
-    return result.data.session;
+export async function getSession(): Promise<Session | null> {
+    const cookieStore = cookies();
+    const supabase = createClient(cookieStore);
+    const { data } = await supabase.auth.getSession();
+  
+    if (data?.session) {
+      const session = data.session as any as Session; // Cast to any first, then to the custom Session type
+      return session;
+    }
+  
+    return null;
 }
+  

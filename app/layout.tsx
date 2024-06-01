@@ -9,6 +9,7 @@ import '@/static/css/reset.css';
 import '@/static/css/style.css';
 import '@/static/css/tipsy.css';
 import Link from "next/link";
+import { useAuth } from "@/components/context/auth-context";
 
 export const metadata: Metadata = {
   title: "Gumroad",
@@ -20,6 +21,12 @@ interface RootLayoutProps {
 }
 
 export default function RootLayout({ children }: RootLayoutProps) {
+  const { user, loading } = useAuth(); // Use the authentication context
+
+  if (loading) {
+    return <div>Loading...</div>; // Adjust this as needed
+  }
+
   return (
     <html lang="en" suppressHydrationWarning>
       <body>
@@ -29,8 +36,16 @@ export default function RootLayout({ children }: RootLayoutProps) {
         <div id="wrapper">
           <div id="header">
             <a href="/"><h1 id="logo">Gumroad</h1></a>
-            <p>Have an account? <Link href="/login" id="login-link" className="underline">Login</Link></p>
-            <p>Thanks for using Gumroad! <Link href="mailto:hi@gumroad.com">Feedback?</Link></p>
+            {!user ? (
+              <p>Have an account? <Link href="/login" id="login-link" className="underline">Login</Link></p>
+            ) : (
+              <p id="account-navigation">
+                <Link href={user.on_links_page ? "/home" : "/links"}>{user.on_links_page ? "Home" : "Your links"}</Link> &bull; 
+                <span className="balance">${user.balance}</span> &bull; 
+                <Link href="/settings">Settings</Link> &bull; 
+                <Link href="/logout">Logout</Link>
+              </p>
+            )}
             <ul id="navigation" className="hidden">
               <li><a href="#">Tour</a></li>
               <li><a href="#">Examples</a></li>
