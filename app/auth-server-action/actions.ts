@@ -24,7 +24,6 @@ export async function signOut() {
     return JSON.stringify(result);
 }
 
-
 export async function signInWithEmailAndPassword(data: {
     email: string;
     password: string;
@@ -46,4 +45,11 @@ export async function signInWithGoogle() {
     const result = await supabase.auth.signInWithOAuth({provider:'google', options:{redirectTo: `http:localhost:3000/auth/callback`}})
 
     return JSON.stringify(result);
+}
+
+export async function getSession() {
+    const cookieStore = cookies()
+    const supabse = createClient(cookieStore)    
+    const result = await supabse.auth.getSession()
+    return result.data.session;
 }
