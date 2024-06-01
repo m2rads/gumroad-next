@@ -28,8 +28,6 @@ type UserFormValue = z.infer<typeof formSchema>;
 export default function UserSignUpForm() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
-  const [email, setEmail] = useState<string>('');
-  const [password, setPassword] = useState<string>('');
 
   const defaultValues = {
     email: "",
@@ -43,9 +41,6 @@ export default function UserSignUpForm() {
 
   const onSubmit = async (data: UserFormValue) => {
     setLoading(true);
-    setEmail(data.email);
-    setPassword(data.password);
-    setLoading(false);
 
     const result = await signUpWithEmail(data);
     const { error } = JSON.parse(result)
