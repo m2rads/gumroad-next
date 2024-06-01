@@ -31,7 +31,7 @@ const Home: React.FC<HomeProps> = ({
       ) : (
         <h3>Last {numberOfDays} day{numberOfDays !== 1 && 's'}</h3>
       )}
-      {/* Had to use a third party lib for representing charts as google char api was deprecated */}
+      {/* Had to use a third party lib for representing charts as google chart api is deprecated */}
       <div className="chart">
         {showChart ? (
           <ResponsiveContainer width="100%" height={225}>
