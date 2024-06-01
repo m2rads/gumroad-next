@@ -36,7 +36,7 @@ const Header = () => {
           <Link href={user.on_links_page ? "/home" : "/links"}>{user.on_links_page ? "Home" : "Your links"}</Link> &bull; 
           <span className="balance">${user.balance}</span> &bull; 
           <Link href="/settings">Settings</Link> &bull; 
-          <button onClick={handleLogout} className="underline">Logout</button>
+          <button onClick={handleLogout}>Logout</button>
         </p>
       )}
       <ul id="navigation" className="hidden">

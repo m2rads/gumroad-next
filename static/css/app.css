@@ -5,7 +5,7 @@
 #account-navigation span, #account-navigation a,  #account-navigation button{ margin: 0 10px; }
     #account-navigation .balance { color: #6c6b65; }
     #account-navigation button:last-child { margin-right: 0; }
-    
+    #account-navigation button { color: rgb(162, 143, 246)}
 /* app main */
 
 #app #large-form, #app #dashboard {
