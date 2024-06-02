@@ -22,13 +22,6 @@ const LinkPaymentForm: React.FC<LinkPaymentFormProps> = ({ permalink, link }) =>
     setFormData({ ...formData, [name]: value });
   };
 
-  const formatUrl = (url: string) => {
-    if (!/^https?:\/\//i.test(url)) {
-      return `http://${url}`;
-    }
-    return url;
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -85,7 +78,7 @@ const LinkPaymentForm: React.FC<LinkPaymentFormProps> = ({ permalink, link }) =>
       // Record the purchase
       const { error: purchaseError } = await supabase
         .from('purchases')
-        .insert([{ owner: link.owner, price: link.price, unique_permalink: link.unique_permalink }]);
+        .insert([{ owner: link.owner, price: link.price, link_id: link.id, unique_permalink: link.unique_permalink }]);
 
       if (purchaseError) {
         setError(purchaseError.message);
@@ -93,8 +86,26 @@ const LinkPaymentForm: React.FC<LinkPaymentFormProps> = ({ permalink, link }) =>
         return;
       }
 
-      // Mock email sending
-      console.log(`Email sent to ${user.email}: You just sold ${link.name}!`);
+      // Send email to the seller
+      const emailResponse = await fetch('/api/send-email', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          to: user.email,
+          subject: 'You just sold a link!',
+          text: `Hi!\n\nYou just sold ${link.name}. Please visit http://localhost:3000/home to check it out.\n\nCongratulations on the sale!\n\nPlease let us know if you have any questions,\nThe Gumroad Team`,
+        }),
+      });
+
+      const emailResult = await emailResponse.json();
+
+      if (!emailResult.success) {
+        setError('Failed to send email notification.');
+        setLoading(false);
+        return;
+      }
 
       // Redirect to link URL
       window.location.assign(formatUrl(link.url));
@@ -103,6 +114,13 @@ const LinkPaymentForm: React.FC<LinkPaymentFormProps> = ({ permalink, link }) =>
     } finally {
       setLoading(false);
     }
+  };
+
+  const formatUrl = (url: string) => {
+    if (!/^https?:\/\//i.test(url)) {
+      return `http://${url}`;
+    }
+    return url;
   };
 
   return (
