@@ -133,7 +133,9 @@ const IndexPage = () => {
     };
 
     fetchData();
-  }, [supabase, user]);
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user]);
 
   if (loading) {
     return <div>Loading...</div>;

@@ -37,7 +37,9 @@ const EditLinkPage = ({ params }: { params: { permalink: string } }) => {
     };
 
     fetchLinkData();
-  }, [supabase, user, params.permalink]);
+    
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user, params.permalink]);
 
   if (loading) {
     return <div>Loading...</div>;

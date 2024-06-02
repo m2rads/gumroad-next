@@ -43,7 +43,8 @@ const LinksComponent: React.FC = () => {
     };
 
     fetchLinks();
-  }, [user, supabase]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user]);
 
   if (loading) {
     return <div>Loading...</div>;
