@@ -49,9 +49,16 @@ const LinkPaymentForm: React.FC<LinkPaymentFormProps> = ({ permalink, link }) =>
     }
   };
 
+  const formatUrl = (url: string) => {
+    if (!/^https?:\/\//i.test(url)) {
+      return `http://${url}`;
+    }
+    return url;
+  };
+
   return (
     <form id="large-form" onSubmit={handleSubmit}>
-      {link.preview_url && <Link href={link.preview_url} id="preview_link" target="_blank">preview</Link>}
+      {link.preview_url && (<a href={formatUrl(link.preview_url)} id="preview_link" target="_blank" rel="noopener noreferrer">preview</a>)}      
       <br/>
 
       <h3>Pay ${link.price}</h3>
