@@ -10,4 +10,6 @@ export interface LinkType {
     created_at: string;
     updated_at: string;
     formatted_price?: string;
+    number_of_views: number;
+    number_of_downloads: number;
   }
