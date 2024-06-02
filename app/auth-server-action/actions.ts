@@ -7,10 +7,10 @@ interface Session {
     user: User;
   }
 
-  export async function signUpWithEmail(data: { email: string; password: string }) {
+export async function signUpWithEmail(data: { email: string; password: string }) {
     const cookieStore = cookies();
     const supabase = createClient(cookieStore);
-    
+
     const result = await supabase.auth.signUp({ email: data.email, password: data.password });
     const user = result?.data?.user;
 
