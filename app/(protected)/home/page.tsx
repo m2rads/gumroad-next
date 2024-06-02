@@ -94,10 +94,23 @@ const IndexPage = () => {
           return;
         }
 
+        const sevenDaysAgo = new Date();
+        sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+
+        const groupedByDate = purchases.reduce((acc: { [key: string]: number }, purchase: any) => {
+          const date = new Date(purchase.create_date).toLocaleDateString();
+          if (!acc[date]) acc[date] = 0;
+          acc[date] += purchase.price;
+          return acc;
+        }, {});
+
+        const chartData = Object.entries(groupedByDate).map(([date, value]) => ({
+          name: date,
+          value,
+        }));
+
         const lastSevenDaysPurchases = purchases.filter((purchase: any) => {
           const purchaseDate = new Date(purchase.create_date);
-          const sevenDaysAgo = new Date();
-          sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
           return purchaseDate >= sevenDaysAgo;
         });
 
@@ -107,11 +120,6 @@ const IndexPage = () => {
           monthAgo.setDate(monthAgo.getDate() - 30);
           return purchaseDate >= monthAgo;
         });
-
-        const chartData = lastSevenDaysPurchases.map((purchase: any, index: number) => ({
-          name: `Day ${index + 1}`,
-          value: purchase.price,
-        }));
 
         const lastSevenDaysPurchaseTotal = lastSevenDaysPurchases.reduce((sum: number, purchase: any) => sum + purchase.price, 0);
         const lastMonthPurchaseTotal = lastMonthPurchases.reduce((sum: number, purchase: any) => sum + purchase.price, 0);
