@@ -2,7 +2,7 @@
 import type { Metadata } from "next";
 import Footer from "@/components/footer";
 import Header from "@/components/header";
-import '@/static/css/globals.css';
+import '@/static/css/global.css';
 import '@/static/css/main.css';
 import '@/static/css/app.css';
 import '@/static/css/gumroad.css';
