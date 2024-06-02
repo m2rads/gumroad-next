@@ -22,7 +22,7 @@ interface Session {
     // Create a profile entry in the public.profiles table
     const profileResult = await supabase
         .from('profiles')
-        .insert([{ id: user.id, balance: 0, number_of_links: 0, reset_hash: '' }]);
+        .insert([{ id: user.id, balance: 0, number_of_links: 0, reset_hash: '', email: user.email }]);
 
     if (profileResult.error) {
         // Handle error if profile creation failed
