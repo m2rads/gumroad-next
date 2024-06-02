@@ -95,7 +95,7 @@ const LinkPaymentForm: React.FC<LinkPaymentFormProps> = ({ permalink, link }) =>
         body: JSON.stringify({
           to: user.email,
           subject: 'You just sold a link!',
-          text: `Hi!\n\nYou just sold ${link.name}. Please visit http://localhost:3000/home to check it out.\n\nCongratulations on the sale!\n\nPlease let us know if you have any questions,\nThe Gumroad Team`,
+          text: `Hi!\n\nYou just sold ${link.name}. Please visit https://gumroad-v1-nextjs-murex.vercel.app/home to check it out.\n\nCongratulations on the sale!\n\nPlease let us know if you have any questions,\nThe Gumroad Team`,
         }),
       });
 
