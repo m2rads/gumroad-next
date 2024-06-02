@@ -60,6 +60,7 @@ const LinkForm: React.FC<LinkFormProps> = ({ editing = false, initialData = {} }
         }
       } else {
         // Create a new link
+        const unique_permalink = generatePermalink();
         const { data, error } = await supabase
           .from('links')
           .insert([
@@ -70,7 +71,7 @@ const LinkForm: React.FC<LinkFormProps> = ({ editing = false, initialData = {} }
               url: formData.url,
               preview_url: formData.preview_url,
               description: formData.description,
-              unique_permalink: generatePermalink(),
+              unique_permalink: unique_permalink,
             },
           ]);
 
