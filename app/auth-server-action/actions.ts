@@ -79,3 +79,20 @@ export async function getSession(): Promise<Session | null> {
     return null;
 }
   
+export async function resetPassword(email: string) {
+    const cookieStore = cookies();
+    const supabase = createClient(cookieStore);
+    const result = await supabase.auth.resetPasswordForEmail(
+        email, 
+        {
+            redirectTo: 'http://localhost:3000/update-password',
+        })
+    return result
+}
+
+export async function updatePassword(password: string) {
+    const cookieStore = cookies();
+    const supabase = createClient(cookieStore);
+    const result = await supabase.auth.updateUser({ password: password })
+    return result
+}
