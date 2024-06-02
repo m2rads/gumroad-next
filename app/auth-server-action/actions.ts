@@ -85,7 +85,7 @@ export async function resetPassword(email: string) {
     const result = await supabase.auth.resetPasswordForEmail(
         email, 
         {
-            redirectTo: 'http://localhost:3000/update-password',
+            redirectTo: 'https://gumroad-v1-nextjs-murex.vercel.app/update-password',
         })
     return result
 }
