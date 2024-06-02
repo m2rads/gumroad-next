@@ -12,6 +12,13 @@ const ViewLinkPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  const formatUrl = (url: string) => {
+    if (!/^https?:\/\//i.test(url)) {
+      return `http://${url}`;
+    }
+    return url;
+  };
+
   useEffect(() => {
     const fetchLink = async () => {
       const { data, error } = await supabase
@@ -33,7 +40,8 @@ const ViewLinkPage: React.FC = () => {
 
         // Redirect if price is less than 0.01
         if (data.price < 0.01) {
-          window.location.href = data.url;
+          window.location.assign(formatUrl(data.url));
+          return; 
         }
       }
       setLoading(false);
