@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import { createSupabaseBrowserClient } from '@/supabase/client';
 import LinkPaymentForm from '@/components/forms/link-payment-form';
+import { Link } from '@nextui-org/react';
 
 const ViewLinkPage: React.FC = () => {
   const { permalink } = useParams();
@@ -22,11 +23,13 @@ const ViewLinkPage: React.FC = () => {
       if (error) {
         setError('Link not found');
       } else {
-        // Increment view count
-        await supabase
-          .from('links')
-          .update({ number_of_views: data.number_of_views + 1 })
-          .eq('id', data.id);
+        // Increment view count only if number_of_views is defined
+        if (typeof data.number_of_views === 'number') {
+          await supabase
+            .from('links')
+            .update({ number_of_views: data.number_of_views + 1 })
+            .eq('id', data.id);
+        }
 
         setLink(data);
       }
@@ -50,21 +53,17 @@ const ViewLinkPage: React.FC = () => {
 
   return (
     <div id="link-content">
+      <div id="header">
+        <Link href="/"><h1 id="logo">Gumroad</h1></Link>
+        <p>{link.name}{link.user_name ? ` from ${link.user_name}` : ''}</p>
+      </div>
+
       {(link.description || link.preview_url) && (
         <div id="description-box">
           <p>{link.description}</p>
         </div>
       )}
-
-      <form id="large-form" name="large-form">
-        {link.preview_url && <a href={link.preview_url} id="preview_link" target="_blank">preview</a>}
-
-        <h3>Pay ${link.price}</h3>
-
-        <LinkPaymentForm permalink={permalink} price={link.price} />
-
-        <div className="rainbow bar"></div>
-      </form>
+      <LinkPaymentForm permalink={permalink} link={link} />
     </div>
   );
 };

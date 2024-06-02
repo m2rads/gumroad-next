@@ -3,13 +3,15 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { createSupabaseBrowserClient } from '@/supabase/client';
+import { LinkType } from '@/types/link';
+import Link from 'next/link';
 
 interface LinkPaymentFormProps {
   permalink: string;
-  price: number;
+  link: LinkType;
 }
 
-const LinkPaymentForm: React.FC<LinkPaymentFormProps> = ({ permalink, price }) => {
+const LinkPaymentForm: React.FC<LinkPaymentFormProps> = ({ permalink, link }) => {
   const [formData, setFormData] = useState({ cardNumber: '', expiryMonth: '', expiryYear: '', securityCode: '' });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -29,6 +31,7 @@ const LinkPaymentForm: React.FC<LinkPaymentFormProps> = ({ permalink, price }) =
     // TODO: Implement payment processing logic here
 
     try {
+      let price = link.price
       // Simulate successful payment
       const response = await supabase
         .from('purchases')
@@ -48,7 +51,9 @@ const LinkPaymentForm: React.FC<LinkPaymentFormProps> = ({ permalink, price }) =
 
   return (
     <form id="large-form" onSubmit={handleSubmit}>
-      <h3>Pay ${price}</h3>
+      {link.preview_url && <Link href={link.preview_url} id="preview_link" target="_blank">preview</Link>}
+
+      <h3>Pay ${link.price}</h3>
 
       {error && <div className="error">{error}</div>}
 
