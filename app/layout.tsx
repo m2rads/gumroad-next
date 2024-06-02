@@ -1,3 +1,4 @@
+'use client'
 import type { Metadata } from "next";
 import Footer from "@/components/footer";
 import Header from "@/components/header";
@@ -10,17 +11,21 @@ import '@/static/css/reset.css';
 import '@/static/css/style.css';
 import '@/static/css/tipsy.css';
 import { AuthProvider } from "@/components/context/auth-context";
+import { usePathname } from 'next/navigation';
 
-export const metadata: Metadata = {
-  title: "Gumroad",
-  description: "Gumroad",
-};
+// export const metadata: Metadata = {
+//   title: "Gumroad",
+//   description: "Gumroad",
+// };
 
 interface RootLayoutProps {
   children: React.ReactNode;
 }
 
 export default function RootLayout({ children }: RootLayoutProps) {
+  const pathname = usePathname();
+  const hideHeaderFooter = pathname.startsWith('/view/');
+
   return (
     <AuthProvider>
       <html lang="en" suppressHydrationWarning>
@@ -28,11 +33,15 @@ export default function RootLayout({ children }: RootLayoutProps) {
           <div className="top-bar"></div>
           <div id="loading-indicator">Loading...</div>
           <div id="wrapper">
-            <Header />
-            <div className="rule"></div>
+            {!hideHeaderFooter && 
+            <>
+              <Header />
+              <div className="rule"></div>
+            </>
+            }
             {children}
           </div>
-          <Footer />
+          {!hideHeaderFooter && <Footer />}
         </body>
       </html>
     </AuthProvider>
