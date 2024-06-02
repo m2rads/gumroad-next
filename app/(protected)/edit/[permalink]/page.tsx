@@ -37,7 +37,7 @@ const EditLinkPage = ({ params }: { params: { permalink: string } }) => {
     };
 
     fetchLinkData();
-  }, [user, params.permalink]);
+  }, [supabase, user, params.permalink]);
 
   if (loading) {
     return <div>Loading...</div>;

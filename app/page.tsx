@@ -13,7 +13,7 @@ export default async function Home() {
         <ul>
           <li id="we-handle-payments">
             <h5>We handle all the payment stuff.</h5>
-            <p>You should be focused on creating awesome content. We'll deal with the rest.</p>
+            <p>You should be focused on creating awesome content. We&apos;ll deal with the rest.</p>
           </li>
           <li id="worldwide">
             <h5>Do what you already do.</h5>

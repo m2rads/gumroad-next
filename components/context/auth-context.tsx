@@ -53,7 +53,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     return () => {
       authListener.subscription.unsubscribe();
     };
-  }, []);
+  }, [checkUser, supabase.auth]);
 
   return (
     <AuthContext.Provider value={{ user, loading, refreshUser: checkUser }}>

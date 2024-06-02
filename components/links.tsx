@@ -43,7 +43,7 @@ const LinksComponent: React.FC = () => {
     };
 
     fetchLinks();
-  }, [user]);
+  }, [user, supabase]);
 
   if (loading) {
     return <div>Loading...</div>;

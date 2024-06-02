@@ -133,7 +133,7 @@ const IndexPage = () => {
     };
 
     fetchData();
-  }, [user]);
+  }, [supabase, user]);
 
   if (loading) {
     return <div>Loading...</div>;
