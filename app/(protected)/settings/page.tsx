@@ -1,16 +1,12 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { createSupabaseBrowserClient } from '@/supabase/client';
 import { useAuth } from '@/components/context/auth-context';
+import { createSupabaseBrowserClient } from '@/supabase/client';
 
-const AccountPage: React.FC = () => {
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    payment_address: '',
-  });
+const AccountPage = () => {
+  const [formData, setFormData] = useState({ name: '', email: '', paymentAddress: '' });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const { user } = useAuth();
@@ -18,26 +14,23 @@ const AccountPage: React.FC = () => {
   const supabase = createSupabaseBrowserClient();
 
   useEffect(() => {
-    if (!user) {
-      router.push('/');
-      return;
-    }
+    const fetchAccountData = async () => {
+      if (!user) return;
 
-    const fetchUserData = async () => {
-      try {        
-        const { data, error } = await supabase
+      try {
+        const { data: profile, error } = await supabase
           .from('profiles')
-          .select('name, email, payment_address')
-          .eq('id', user.id)
+          .select('*')
+          .eq('email', user.email)
           .single();
 
         if (error) {
           setError(error.message);
         } else {
           setFormData({
-            name: data.name || '',
-            email: data.email || '',
-            payment_address: data.payment_address || '',
+            name: profile.name,
+            email: profile.email,
+            paymentAddress: profile.payment_address,
           });
         }
       } catch (error) {
@@ -47,12 +40,12 @@ const AccountPage: React.FC = () => {
       }
     };
 
-    fetchUserData();
-  }, [user, router, supabase]);
+    fetchAccountData();
+  }, [user, supabase]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    setFormData({ ...formData, [name]: value });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -61,31 +54,19 @@ const AccountPage: React.FC = () => {
     setError(null);
 
     try {
+      // Update the profile without changing the email
       if (user == null) return;
-
-      const { data, error } = await supabase
+      const { error: profileError } = await supabase
         .from('profiles')
         .update({
           name: formData.name,
-          email: formData.email,
-          payment_address: formData.payment_address,
+          payment_address: formData.paymentAddress,
         })
-        .eq('id', user.id);
+        .eq('email', user.email);
 
-      if (error) {
-        setError(error.message);
+      if (profileError) {
+        setError(profileError.message);
       } else {
-        // Update the user's email in the auth.users table
-        await supabase.auth.updateUser({
-          email: formData.email,
-        });
-
-        // Update the owner field in the links table
-        await supabase
-          .from('links')
-          .update({ owner: formData.email })
-          .eq('owner', user.email);
-
         router.push('/');
       }
     } catch (error) {
@@ -101,8 +82,8 @@ const AccountPage: React.FC = () => {
 
   return (
     <form id="large-form" onSubmit={handleSubmit}>
+      {error && <h3 className="error">{error}</h3>}
       <h3>Your account settings</h3>
-      {error && <small className="error">{error}</small>}
       <p>
         <label htmlFor="name">Full name: </label>
         <input
@@ -110,29 +91,28 @@ const AccountPage: React.FC = () => {
           name="name"
           type="text"
           placeholder="Full Name"
-          value={formData.name}
+          value={formData.name || ''}
           onChange={handleChange}
         />
       </p>
       <p>
         <label htmlFor="email">Email address: </label>
         <input
-          id="email"
-          name="email"
           type="text"
           placeholder="Email Address"
-          value={formData.email}
-          onChange={handleChange}
+          name="email"
+          value={formData.email || ''}
+          disabled
         />
       </p>
       <p>
-        <label htmlFor="payment_address">PayPal address: </label>
+        <label htmlFor="paymentAddress">PayPal address: </label>
         <input
-          id="payment_address"
-          name="payment_address"
+          id="paymentAddress"
+          name="paymentAddress"
           type="text"
           placeholder="PayPal Address"
-          value={formData.payment_address}
+          value={formData.paymentAddress || ''}
           onChange={handleChange}
         />
       </p>
