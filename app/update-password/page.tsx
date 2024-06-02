@@ -35,7 +35,7 @@ const UpdatePasswordPage = () => {
           success ? (
             <h3>{success}</h3>
           ) : (
-            <h3>Reset your password <small>And don't worry about forgetting your password, we do too!</small></h3>
+            <h3>Reset your password <small>And don&apos;t worry about forgetting your password, we do too!</small></h3>
           )
         )}
         <p>

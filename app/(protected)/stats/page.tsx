@@ -83,9 +83,9 @@ const StatsPage = () => {
       <p>There are <strong>{stats.numberOfLinks}</strong> links and counting.</p>
       <p>There are <strong>{stats.numberOfUsers}</strong> users and counting.</p>
       <p>There have been $<strong>{stats.purchaseTotal}</strong> worth of purchases. There are <strong>{stats.numberOfPurchases}</strong> purchases and counting.</p>
-      <p>That's an average of $<strong>{stats.averagePurchase}</strong> per purchase!</p>
-      <p>They've been viewed <strong>{stats.numberOfViews}</strong> times and downloaded <strong>{stats.numberOfDownloads}</strong> times.</p>
-      <p>That's an average of <strong>{stats.averageViews}</strong> views and <strong>{stats.averageDownloads}</strong> downloads per link!</p>
+      <p>That&apos;s an average of $<strong>{stats.averagePurchase}</strong> per purchase!</p>
+      <p>They&apos;ve been viewed <strong>{stats.numberOfViews}</strong> times and downloaded <strong>{stats.numberOfDownloads}</strong> times.</p>
+      <p>That&apos;s an average of <strong>{stats.averageViews}</strong> views and <strong>{stats.averageDownloads}</strong> downloads per link!</p>
       <p>The last link was added <strong>{stats.lastLinkDate}</strong> ago.</p>
       <p>The last purchase was made <strong>{stats.lastPurchaseDate}</strong> ago.</p>
     </div>
