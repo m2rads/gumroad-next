@@ -18,6 +18,7 @@ import { signInWithEmailAndPassword } from "@/app/auth-server-action/actions";
 import { Toaster } from "../ui/toaster";
 import { toast } from "../ui/use-toast";
 import { useAuth } from '@/components/context/auth-context';
+import { Link } from "lucide-react";
 
 const formSchema = z.object({
   email: z.string().email({ message: "Enter a valid email address" }),
@@ -134,7 +135,7 @@ export default function UserSignInForm() {
         </form>
       </Form>
       <p id="below-form-p" className="mt-2 text-center">
-        <a href="/forgot-password" className="text-blue-600 hover:underline">Forgot your password?</a> We all do.
+        <Link href="/forgot-password" className="text-blue-600 hover:underline">Forgot your password?</Link> We all do.
       </p>
       <Toaster />
     </>
