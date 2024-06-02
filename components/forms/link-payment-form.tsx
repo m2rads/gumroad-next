@@ -4,7 +4,6 @@ import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { createSupabaseBrowserClient } from '@/supabase/client';
 import { LinkType } from '@/types/link';
-import axios from 'axios';
 
 interface LinkPaymentFormProps {
   permalink: string;
@@ -23,54 +22,87 @@ const LinkPaymentForm: React.FC<LinkPaymentFormProps> = ({ permalink, link }) =>
     setFormData({ ...formData, [name]: value });
   };
 
+  const formatUrl = (url: string) => {
+    if (!/^https?:\/\//i.test(url)) {
+      return `http://${url}`;
+    }
+    return url;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
 
     try {
-      // Create payment intent on the server
-      const { data: { clientSecret } } = await axios.post('/api/create-payment-intent', {
-        amount: link.price as any * 100, // Stripe expects amount in cents
-      });
-
-      // Confirm the payment intent on the server
-      const { data: { paymentIntent } } = await axios.post('/api/confirm-payment-intent', {
-        paymentIntentId: clientSecret,
-        paymentMethodData: {
-          number: formData.cardNumber,
-          exp_month: parseInt(formData.expiryMonth),
-          exp_year: parseInt(formData.expiryYear),
-          cvc: formData.securityCode,
-        },
-      });
-
-      if (paymentIntent.status === 'succeeded') {
-        // Record the successful purchase
-        const response = await supabase
-          .from('purchases')
-          .insert([{ permalink, price: link.price, payment_intent_id: paymentIntent.id }]);
-
-        if (response.error) {
-          setError(response.error.message);
-        } else {
-          router.push('/success');
-        }
-      } else {
-        setError('Payment failed');
+      // Mock payment processing
+      if (!formData.cardNumber || !formData.expiryMonth || !formData.expiryYear || !formData.securityCode) {
+        setError('Please fill in all the card details.');
+        setLoading(false);
+        return;
       }
+
+      // Fetch the user information using the owner field from the LinkType object
+      const { data: user, error: userError } = await supabase
+        .from('profiles')  // Assuming the table name is 'profiles'
+        .select('*')
+        .eq('id', link.owner)
+        .single();
+
+      if (userError) {
+        setError(userError.message);
+        setLoading(false);
+        return;
+      }
+
+      // Update link with incremented views and downloads
+      const { data, error: updateError } = await supabase
+        .from('links')
+        .update({
+          number_of_views: link.number_of_views + 1,
+          number_of_downloads: link.number_of_downloads + 1,
+        })
+        .eq('id', link.id);
+
+      if (updateError) {
+        setError(updateError.message);
+        setLoading(false);
+        return;
+      }
+
+      // Update user balance (mock)
+      const { error: balanceError } = await supabase
+        .from('profiles')  // Assuming the table name is 'profiles'
+        .update({ balance: user.balance + link.price })
+        .eq('id', link.owner);
+
+      if (balanceError) {
+        setError(balanceError.message);
+        setLoading(false);
+        return;
+      }
+
+      // Record the purchase
+      const { error: purchaseError } = await supabase
+        .from('purchases')
+        .insert([{ owner: link.owner, price: link.price, unique_permalink: link.unique_permalink }]);
+
+      if (purchaseError) {
+        setError(purchaseError.message);
+        setLoading(false);
+        return;
+      }
+
+      // Mock email sending
+      console.log(`Email sent to ${user.email}: You just sold ${link.name}!`);
+
+      // Redirect to link URL
+      window.location.assign(formatUrl(link.url));
     } catch (error) {
       setError((error as Error).message);
     } finally {
       setLoading(false);
     }
-  };
-
-  const formatUrl = (url: string) => {
-    if (!/^https?:\/\//i.test(url)) {
-      return `http://${url}`;
-    }
-    return url;
   };
 
   return (
