@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { createSupabaseBrowserClient } from '@/supabase/client';
 import { LinkType } from '@/types/link';
-import Link from 'next/link';
+import axios from 'axios';
 
 interface LinkPaymentFormProps {
   permalink: string;
@@ -28,19 +28,36 @@ const LinkPaymentForm: React.FC<LinkPaymentFormProps> = ({ permalink, link }) =>
     setLoading(true);
     setError(null);
 
-    // TODO: Implement payment processing logic here
-
     try {
-      let price = link.price
-      // Simulate successful payment
-      const response = await supabase
-        .from('purchases')
-        .insert([{ permalink, price, ...formData }]);
+      // Create payment intent on the server
+      const { data: { clientSecret } } = await axios.post('/api/create-payment-intent', {
+        amount: link.price as any * 100, // Stripe expects amount in cents
+      });
 
-      if (response.error) {
-        setError(response.error.message);
+      // Confirm the payment intent on the server
+      const { data: { paymentIntent } } = await axios.post('/api/confirm-payment-intent', {
+        paymentIntentId: clientSecret,
+        paymentMethodData: {
+          number: formData.cardNumber,
+          exp_month: parseInt(formData.expiryMonth),
+          exp_year: parseInt(formData.expiryYear),
+          cvc: formData.securityCode,
+        },
+      });
+
+      if (paymentIntent.status === 'succeeded') {
+        // Record the successful purchase
+        const response = await supabase
+          .from('purchases')
+          .insert([{ permalink, price: link.price, payment_intent_id: paymentIntent.id }]);
+
+        if (response.error) {
+          setError(response.error.message);
+        } else {
+          router.push('/success');
+        }
       } else {
-        router.push('/success');
+        setError('Payment failed');
       }
     } catch (error) {
       setError((error as Error).message);
@@ -58,8 +75,12 @@ const LinkPaymentForm: React.FC<LinkPaymentFormProps> = ({ permalink, link }) =>
 
   return (
     <form id="large-form" onSubmit={handleSubmit}>
-      {link.preview_url && (<a href={formatUrl(link.preview_url)} id="preview_link" target="_blank" rel="noopener noreferrer">preview</a>)}      
-      <br/>
+      {link.preview_url && (
+        <a href={formatUrl(link.preview_url)} id="preview_link" target="_blank" rel="noopener noreferrer">
+          preview
+        </a>
+      )}
+      <br />
 
       <h3>Pay ${link.price}</h3>
 
@@ -86,7 +107,18 @@ const LinkPaymentForm: React.FC<LinkPaymentFormProps> = ({ permalink, link }) =>
           onChange={handleChange}
           disabled={loading}
         >
-          {/* Add options for months */}
+          <option value="1">January</option>
+          <option value="2">February</option>
+          <option value="3">March</option>
+          <option value="4">April</option>
+          <option value="5">May</option>
+          <option value="6">June</option>
+          <option value="7">July</option>
+          <option value="8">August</option>
+          <option value="9">September</option>
+          <option value="10">October</option>
+          <option value="11">November</option>
+          <option value="12">December</option>
         </select>
         <span id="slash">/</span>
         <select
@@ -96,7 +128,9 @@ const LinkPaymentForm: React.FC<LinkPaymentFormProps> = ({ permalink, link }) =>
           onChange={handleChange}
           disabled={loading}
         >
-          {/* Add options for years */}
+          {Array.from({ length: 20 }, (_, i) => new Date().getFullYear() + i).map(year => (
+            <option key={year} value={year}>{year}</option>
+          ))}
         </select>
       </p>
       <p>
