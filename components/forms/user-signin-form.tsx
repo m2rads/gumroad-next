@@ -18,7 +18,7 @@ import { signInWithEmailAndPassword } from "@/app/auth-server-action/actions";
 import { Toaster } from "../ui/toaster";
 import { toast } from "../ui/use-toast";
 import { useAuth } from '@/components/context/auth-context';
-import { Link } from "lucide-react";
+import Link from "next/link";
 
 const formSchema = z.object({
   email: z.string().email({ message: "Enter a valid email address" }),
