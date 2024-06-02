@@ -52,6 +52,7 @@ const LinkPaymentForm: React.FC<LinkPaymentFormProps> = ({ permalink, link }) =>
   return (
     <form id="large-form" onSubmit={handleSubmit}>
       {link.preview_url && <Link href={link.preview_url} id="preview_link" target="_blank">preview</Link>}
+      <br/>
 
       <h3>Pay ${link.price}</h3>
 
